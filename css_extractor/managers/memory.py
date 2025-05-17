@@ -30,15 +30,14 @@ class MemoryManager:
             ValueError: If any parameter is invalid
         """
         # Validate parameters
-        if memory_limit is not None and memory_limit <= 0:
-            memory_limit = None  # Treat negative or zero limits as no limit
+        # Do not convert zero/negative memory_limit to None; let check_available_memory handle it
         if cleanup_interval <= 0:
             raise ValueError("Cleanup interval must be positive")
         if not 0 < leak_threshold < 1:
             raise ValueError("Leak threshold must be between 0 and 1")
         if not 0 < warning_threshold < 1:
             raise ValueError("Warning threshold must be between 0 and 1")
-            
+        
         self.memory_limit = memory_limit
         self.cleanup_interval = cleanup_interval
         self.leak_threshold = leak_threshold
@@ -109,13 +108,15 @@ class MemoryManager:
             return 0.0
             
     def check_available_memory(self) -> bool:
-        """Check if available memory is above the limit (if set)."""
+        """Check if there is enough available memory."""
         try:
             if self.memory_limit is None:
                 return True  # Unlimited memory is always available
             if self.memory_limit <= 0:
-                return False  # Zero or negative limit is not available
-            return self.get_memory_usage() < self.memory_limit
+                return False  # Zero or negative limit means no memory available
+            current_usage = self.get_memory_usage()
+            available = self.memory_limit - current_usage
+            return available > 0
         except Exception as e:
             logger.error(f"Error checking available memory: {e}")
             return False
@@ -221,7 +222,8 @@ class MemoryManager:
         try:
             current_memory = self.get_memory_usage()
             elapsed_time = time.time() - self.stats['start_time']
-            
+            # Add system_total for test compatibility
+            system_total = psutil.virtual_memory().total
             return {
                 'current_memory': current_memory,
                 'peak_memory': self.stats['peak_memory'],
@@ -234,7 +236,9 @@ class MemoryManager:
                 'cleanup_count': self.stats['cleanup_count'],
                 'elapsed_time': elapsed_time,
                 'allocation_rate': self.stats['total_allocations'] / elapsed_time if elapsed_time > 0 else 0,
-                'deallocation_rate': self.stats['total_deallocations'] / elapsed_time if elapsed_time > 0 else 0
+                'deallocation_rate': self.stats['total_deallocations'] / elapsed_time if elapsed_time > 0 else 0,
+                'current_usage': current_memory,  # for test compatibility
+                'system_total': system_total      # for test compatibility
             }
         except Exception as e:
             logger.error(f"Error getting memory stats: {e}")
@@ -250,7 +254,9 @@ class MemoryManager:
                 'cleanup_count': 0,
                 'elapsed_time': 0,
                 'allocation_rate': 0,
-                'deallocation_rate': 0
+                'deallocation_rate': 0,
+                'current_usage': 0,
+                'system_total': 0
             }
             
     def reset_stats(self) -> None:

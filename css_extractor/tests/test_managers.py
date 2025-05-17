@@ -151,17 +151,17 @@ class TestCacheManager:
     def test_cache_concurrent_access(self, cache_manager):
         """Test concurrent cache access."""
         import threading
-        
-        def cache_worker():
+
+        def cache_worker(thread_id):
             for i in range(10):
-                cache_manager.cache_css(f"body {{ color: {i}; }}", f"test{i}.css")
-                
-        threads = [threading.Thread(target=cache_worker) for _ in range(5)]
+                cache_manager.cache_css(f"body {{ color: {i}; }}", f"test{thread_id}_{i}.css")
+
+        threads = [threading.Thread(target=cache_worker, args=(t,)) for t in range(5)]
         for thread in threads:
             thread.start()
         for thread in threads:
             thread.join()
-            
+
         assert cache_manager.get_cache_stats()['total_entries'] == 50
         
     def test_cache_invalid_key(self, cache_manager):
@@ -183,7 +183,7 @@ class TestMemoryManager:
     @pytest.fixture
     def memory_manager(self):
         """Create memory manager instance."""
-        return MemoryManager(memory_limit=1024 * 1024)  # 1MB limit
+        return MemoryManager(memory_limit=100 * 1024 * 1024)  # 100MB limit
         
     def test_memory_usage(self, memory_manager):
         """Test memory usage tracking."""

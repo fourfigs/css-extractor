@@ -180,59 +180,56 @@ class CacheManager:
             # Generate key if not provided
             if key is None:
                 key = hashlib.sha256(css_content.encode()).hexdigest()
+                # Add thread ID and UUID only for auto-generated keys
+                thread_id = threading.get_ident()
+                key = f"{key}_{thread_id}_{uuid.uuid4().hex}"
             logger.debug(f"Generated/Using key: {key}")
             
             content_size = len(css_content.encode())
             current_time = time.time()
             
             with self._cache_lock:
-                # Get unique key
-                original_key = key
-                while key in self.metadata:
-                    key = f"{original_key}_{uuid.uuid4().hex}"
-                logger.debug(f"Final unique key: {key}")
-                
-                # Write file
+                # Write file atomically
                 cache_file = self.cache_dir / key
+                temp_file = self.cache_dir / f"{key}.tmp"
                 logger.debug(f"Writing to file: {cache_file}")
-                with open(cache_file, 'w') as f:
-                    f.write(css_content)
-                logger.debug("File write complete")
                 
-                # Update metadata
-                logger.debug("Updating metadata")
-                self.metadata[key] = {
-                    'timestamp': current_time,
-                    'size': content_size
-                }
-                
-                # Handle cleanup
-                if current_time - self.last_cleanup >= self.cleanup_interval:
-                    logger.debug("Running cleanup")
-                    self._clean_expired()
-                    self.last_cleanup = current_time
-                
-                # Check size limit
-                if not self._check_size_limit():
-                    logger.debug("Making space")
-                    self._make_space(content_size)
-                
-                # Save metadata
-                logger.debug("Saving metadata")
-                self._save_metadata()
-                logger.debug("Metadata saved")
-            
-            logger.debug("Cache operation completed")
-            return key
-            
-        except Exception as e:
-            # Clean up file if it was created
-            if 'cache_file' in locals() and cache_file.exists():
                 try:
-                    cache_file.unlink()
-                except:
-                    pass
+                    # Write to temp file first
+                    with open(temp_file, 'w') as f:
+                        f.write(css_content)
                     
+                    # Atomic rename
+                    temp_file.rename(cache_file)
+                    logger.debug("File write complete")
+                    
+                    # Update metadata
+                    logger.debug("Updating metadata")
+                    self.metadata[key] = {
+                        'size': content_size,
+                        'timestamp': current_time,
+                        'original_key': key
+                    }
+                    
+                    # Save metadata
+                    logger.debug("Saving metadata")
+                    self._save_metadata()
+                    logger.debug("Metadata saved")
+                    
+                    # Check size limit
+                    if not self._check_size_limit():
+                        self._make_space(content_size)
+                        
+                    logger.debug("Cache operation completed")
+                    return key
+                    
+                except Exception as e:
+                    # Clean up temp file if it exists
+                    if temp_file.exists():
+                        temp_file.unlink()
+                    raise e
+                    
+        except Exception as e:
             logger.error(f"Error caching CSS: {e}")
             self.stats['errors'] += 1
             raise CacheError(f"Failed to cache CSS: {e}")
