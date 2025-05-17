@@ -1,0 +1,15 @@
+beautifulsoup4>=4.9.3
+requests>=2.25.1
+chardet>=4.0.0
+typing-extensions>=3.7.4
+pathlib>=1.0.1
+urllib3>=1.26.5
+certifi>=2020.12.5
+idna>=2.10
+soupsieve>=2.2.1
+cssmin==0.2.0
+cssutils==2.9.0
+packaging==23.2
+tqdm==4.66.1
+colorama==0.4.6
+psutil==5.9.5 
