@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Java CSS Optimizer
 
 A powerful tool for optimizing Java Swing applications by converting style methods to CSS, making your UI code cleaner and more maintainable.
@@ -61,3 +62,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 Kenneth Hanks (fourfigs@gmail.com) 
+=======
+# css-extractor
+>>>>>>> ce40b851076a2eba2b5913f07a93ea881130459c
