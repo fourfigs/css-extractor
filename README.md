@@ -1,39 +1,63 @@
-# CSS Extractor (them3ripper)
+# Java CSS Optimizer
 
-A robust, scalable, and secure CSS extraction and management tool for modern web projects. Supports advanced caching, memory management, and concurrent operations on Windows, Linux, and macOS.
+A powerful tool for optimizing Java Swing applications by converting style methods to CSS, making your UI code cleaner and more maintainable.
 
 ## Features
-- Extracts CSS files from directories and outputs to a specified directory
-- Thread-safe, cross-platform cache management
-- Memory management with leak detection and critical usage alerts
-- Network management with request limits and domain validation
-- Comprehensive test suite (pytest)
-- Custom license: Free for personal/commercial use with required user registration (see LICENSE)
+
+- Extracts style methods from Java Swing code
+- Converts Java style methods to CSS
+- Generates optimized CSS files
+- Supports template-based customization
+- Advanced caching system
+- Thread-safe operations
+- Comprehensive test suite
 
 ## Installation
-```sh
-pip install .
+
+```bash
+pip install java-css-optimizer
 ```
 
 ## Usage
-```sh
-python -m css_extractor <input_dir> <output_dir>
+
+```python
+from java_css_optimizer import JavaCSSOptimizer
+
+# Initialize the optimizer
+optimizer = JavaCSSOptimizer()
+
+# Process Java files
+optimizer.process_file("path/to/your/java/file.java")
+
+# Generate CSS
+optimizer.generate_css("output.css")
 ```
 
-## License & Registration
-This software is free for personal and commercial use, but you must register your usage by emailing the author (see LICENSE for details). Unauthorized distribution is prohibited.
+## Development
 
-## Running Tests
-```sh
-pip install -r css_extractor/tests/requirements-test.txt
-pytest css_extractor/tests/ -v
+1. Clone the repository:
+```bash
+git clone https://github.com/fourfigs/java-css-optimizer.git
+```
+
+2. Install development dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+3. Run tests:
+```bash
+python -m java_css_optimizer.tests.run_tests
 ```
 
 ## Contributing
-Pull requests are welcome! Please ensure all tests pass before submitting.
+
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Author
-Kenneth Hanks
 
----
-For questions or registration, contact: fourfigs@gmail.com 
+Kenneth Hanks (fourfigs@gmail.com) 

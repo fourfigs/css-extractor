@@ -12,4 +12,9 @@ cssutils==2.9.0
 packaging==23.2
 tqdm==4.66.1
 colorama==0.4.6
-psutil==5.9.5 
+psutil==5.9.5
+csscompressor>=0.9.5
+logging>=0.5.1.2
+concurrent-futures>=3.0.5
+weakref>=1.0.0
+threading>=3.4 

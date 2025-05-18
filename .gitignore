@@ -32,26 +32,22 @@ ENV/
 .vscode/
 *.swp
 *.swo
-.project
-.pydevproject
-.settings/
 
 # Testing
-.pytest_cache/
 .coverage
 htmlcov/
+.pytest_cache/
 .tox/
-.nox/
+nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
 
 # Project specific
 .css_cache/
-*.log
 test_output.txt
-*.css
-!css_extractor/tests/test_files/*.css
+test_results.log
+test_report.txt
 
 # OS specific
 .DS_Store
